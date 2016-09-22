@@ -136,8 +136,8 @@ public class Arm
 
             xt = xa + h*Math.cos(alpha-Math.PI/2);
             yt = ya + h*Math.sin(alpha-Math.PI/2);
-            double xt = xa - h*Math.cos((Math.PI/2) - alpha);
-            double yt = ya - h*Math.sin((Math.PI/2) - alpha);
+            double xt2 = xa - h*Math.cos(alpha-Math.PI/2);
+            double yt2 = ya - h*Math.sin(alpha-Math.PI/2);
         } else {
             valid_state = false;
         }
@@ -163,18 +163,17 @@ public class Arm
         }
       
         double l1 = d1/2;
-        double h1 = Math.sqrt(r*r - d1*d1/4);
-        double a1 = Math.atan2((yt - ym1),(xt - xm1));
+        double h1 = Math.sqrt(r*r - l1*l1);
+        double a1 = Math.atan2((yt - ym1),(xm1-xt));
         
         //positions of y
         double xa1 = xm1 + 0.5*(xt - xm1);
         double ya1 = ym1 + 0.5*(yt - ym1);
         
-        UI.drawLine(xm1,ym1,xa1,ya1);
         // elbows positions
         xj1 = xa1 + h1 * Math.cos(Math.PI/2 - a1);
         yj1 = ya1 + h1 * Math.sin(Math.PI/2 - a1);
-        UI.drawLine(xm1,ym1,xj1,yj1);
+        
         theta1 = Math.atan2(yj1 - ym1, xj1 - xm1);
         if ((theta1>0)||(theta1<-Math.PI)){
             valid_state = false;
@@ -195,7 +194,7 @@ public class Arm
         double l2 = d2/2;
 
         double h2 = Math.sqrt(r*r - l2*l2);
-        double a2 = Math.atan2((yt - ym2),(xt - xm2));
+        double a2 = Math.atan2((yt - ym2),(xm2 - xt));
         //positions of y
         double xa2 = xm2 + 0.5*(xt - xm2);
         double ya2 = ym2 + 0.5*(yt - ym2);
@@ -245,3 +244,4 @@ public class Arm
     }
 
 }
+
