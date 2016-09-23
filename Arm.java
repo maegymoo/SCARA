@@ -1,4 +1,3 @@
-package JavaCode;
 
 
 /**
@@ -42,6 +41,9 @@ public class Arm
     private double theta1; // angle of the upper arm
     private double theta2;
 
+    private int mot1;
+    private int mot2;
+
     private double xj1;     // positions of the joints
     private double yj1; 
     private double xj2;
@@ -55,9 +57,9 @@ public class Arm
      */
     public Arm()
     {
-        xm1 = 290; // set motor coordinates
-        ym1 = 372;
-        xm2 = 379;
+        xm1 = 288; // set motor coordinates
+        ym1 = 377;
+        xm2 = 378;
         ym2 = 374;
         r = 156.0;
         theta1 = -90.0*Math.PI/180.0; // initial angles of the upper arms
@@ -90,6 +92,9 @@ public class Arm
         UI.drawString(out_str, xm1-2*mr,ym1-mr/2+3*mr);
         out_str=String.format("ym1=%d",ym1);
         UI.drawString(out_str, xm1-2*mr,ym1-mr/2+4*mr);
+        out_str=String.format("mot1=%d",mot1);
+        UI.drawString(out_str, xm1-2*mr,ym1-mr/2+5*mr);
+
         // ditto for second motor                
         out_str = String.format("t2=%3.1f",theta2*180/Math.PI);
         UI.drawString(out_str, xm2+2*mr,ym2-mr/2+2*mr);
@@ -97,6 +102,8 @@ public class Arm
         UI.drawString(out_str, xm2+2*mr,ym2-mr/2+3*mr);
         out_str=String.format("ym2=%d",ym2);
         UI.drawString(out_str, xm2+2*mr,ym2-mr/2+4*mr);
+        out_str=String.format("mot2=%d",mot2);
+        UI.drawString(out_str, xm2+2*mr,ym2-mr/2+5*mr);
         // draw Field Of View
         UI.setColor(Color.GRAY);
         UI.drawRect(0,0,640,480);
@@ -123,15 +130,15 @@ public class Arm
     public void directKinematic(){
 
         // midpoint between joints
-        double xa = xj1 + 0.5*(xj2 - xj1);
-        double ya = yj1 + 0.5*(yj2 - yj1);
+        double  xa = xj1 + 0.5*(xj2 - xj1);
+        double  ya = yj1 + 0.5*(yj2 - yj1);
         // distance between joints
         double d = Math.sqrt(Math.pow(xj1 - xj2, 2) + Math.pow(yj1 - yj2, 2));
         if (d<2*r){
             valid_state = true;
             // half distance between tool positions
             double  h = Math.sqrt(Math.pow(r, 2)/2 - (Math.pow(xj1 - xj2, 2) + Math.pow(yj1 - yj2, 2))/8);
-            double alpha = Math.atan2((yj1-yj2),(xj1-xj2)) ;
+            double alpha = Math.atan((yj1-yj2)/(xj1-xj2)) ;
             // tool position
 
             xt = xa + h*Math.cos(alpha-Math.PI/2);
@@ -147,7 +154,7 @@ public class Arm
     // motor angles from tool position
     // updetes variables of the class
     public void inverseKinematic(double xt_new,double yt_new){
-        
+
         valid_state = true;
         xt = xt_new;
         yt = yt_new;
@@ -161,19 +168,19 @@ public class Arm
             valid_state = false;
             return;
         }
-      
+
         double l1 = d1/2;
         double h1 = Math.sqrt(r*r - l1*l1);
         double a1 = Math.atan2((yt - ym1),(xm1-xt));
-        
+
         //positions of y
         double xa1 = xm1 + 0.5*(xt - xm1);
         double ya1 = ym1 + 0.5*(yt - ym1);
-        
+
         // elbows positions
         xj1 = xa1 + h1 * Math.cos(Math.PI/2 - a1);
         yj1 = ya1 + h1 * Math.sin(Math.PI/2 - a1);
-        
+
         theta1 = Math.atan2(yj1 - ym1, xj1 - xm1);
         if ((theta1>0)||(theta1<-Math.PI)){
             valid_state = false;
@@ -198,7 +205,7 @@ public class Arm
         //positions of y
         double xa2 = xm2 + 0.5*(xt - xm2);
         double ya2 = ym2 + 0.5*(yt - ym2);
-        
+
         // elbows positions
         xj2 = xa2 - h2 * Math.cos(Math.PI/2 - a2);
         yj2 = ya2 - h2 * Math.sin(Math.PI/2 - a2);
@@ -209,9 +216,11 @@ public class Arm
             UI.println("Ange 2 -invalid");
             return;
         }
+        setMotor();
 
         UI.printf("xt:%3.1f, yt:%3.1f\n",xt,yt);
         UI.printf("theta1:%3.1f, theta2:%3.1f\n",theta1*180/Math.PI,theta2*180/Math.PI);
+        
         return;
     }
 
@@ -243,5 +252,10 @@ public class Arm
         return pwm;
     }
 
+    public void setMotor(){
+       // mot1 = (int)((theta1 - 46.9)/-0.098);
+        //mot2 = (int)((theta2 - 70.6)/-0.098);
+        mot1 = (int)(((theta1*180/Math.PI) * -10.17) + 182.57);
+        mot2 = (int)(((theta2*180/Math.PI) * -10.187) + 721.62);
+    }
 }
-
