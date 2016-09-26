@@ -22,7 +22,7 @@ public class Main{
     // 1 - inverse point kinematics - point
     // 2 - enter path. Each click adds point  
     // 3 - enter path pause. Click does not add the point to the path
-
+    // 4 - circle
     /**      */
     public Main(){
         UI.initialise();
@@ -32,17 +32,23 @@ public class Main{
         UI.addButton("Load path XY", this::load_xy);
         UI.addButton("Save path Ang", this::save_ang);
         UI.addButton("Load path Ang:Play", this::load_ang);
-
+        //UI.addButton("Circle", this::addCircle);
         // UI.addButton("Quit", UI::quit);
         UI.setMouseMotionListener(this::doMouse);
         UI.setKeyListener(this::doKeys);
 
         //ServerSocket serverSocket = new ServerSocket(22); 
+        this.tool_path = new ToolPath();
         this.arm = new Arm();
         this.drawing = new Drawing();
         this.run();
         arm.draw();
     }
+
+    /*public void addCircle(){
+        state = 4;
+    }
+    */
 
     public void doKeys(String action){
         UI.printf("Key :%s \n", action);
@@ -62,6 +68,24 @@ public class Main{
         String out_str=String.format("%3.1f %3.1f",x,y);
         UI.drawString(out_str, x+10,y+10);
         // 
+        /*if ((state == 4)&&(action.equals("clicked"))){
+            double x1 = x;
+            double y1 = y;
+            double r = 25;
+            for(int t = 0; t<=360; t++){
+                double cx = x1 + r*Math.cos(t);
+                double cy = y1 + r*Math.sin(t);
+                UI.printf("Adding point x=%f y=%f\n",cx,cy);
+            drawing.add_point_to_path(x,y,false); // add point with pen down
+
+            arm.inverseKinematic(cx,cy);
+            arm.draw();
+            drawing.draw();
+            drawing.print_path();
+            }
+            
+        }
+        */
         if ((state == 1)&&(action.equals("clicked"))){
             // draw as 
 
@@ -114,7 +138,7 @@ public class Main{
         }
 
     }
-    
+
     public void save_xy(){
         state = 0;
         String fname = UIFileChooser.save();
@@ -141,8 +165,11 @@ public class Main{
 
     // save angles into the file
     public void save_ang(){
-        String fname = UIFileChooser.open();
+        state = 0;
+        String fname = UIFileChooser.save();
         tool_path.convert_drawing_to_angles(drawing,arm,fname);
+        tool_path.convert_angles_to_pwm(arm);
+        tool_path.save_pwm_file(fname);
     }
 
     //loads angles from a file
