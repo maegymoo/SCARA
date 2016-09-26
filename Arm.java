@@ -39,9 +39,6 @@ public class Arm
     private double theta1; // angle of the upper arm
     private double theta2;
 
-    private int mot1;       //not sure what this does ask guys
-    private int mot2;
-
     private double xj1;     // positions of the joints
     private double yj1; 
     private double xj2;
@@ -64,7 +61,8 @@ public class Arm
         theta2 = -90.0*Math.PI/180.0;
         valid_state = false;
     }
-
+    
+    
     // draws arm on the canvas
     public void draw()
     {
@@ -90,9 +88,6 @@ public class Arm
         UI.drawString(out_str, xm1-2*mr,ym1-mr/2+3*mr);
         out_str=String.format("ym1=%d",ym1);
         UI.drawString(out_str, xm1-2*mr,ym1-mr/2+4*mr);
-        //added by guys
-        out_str=String.format("mot1=%d",mot1);
-        UI.drawString(out_str, xm1-2*mr,ym1-mr/2+5*mr);
 
         // ditto for second motor                
         out_str = String.format("t2=%3.1f",theta2*180/Math.PI);
@@ -101,9 +96,6 @@ public class Arm
         UI.drawString(out_str, xm2+2*mr,ym2-mr/2+3*mr);
         out_str=String.format("ym2=%d",ym2);
         UI.drawString(out_str, xm2+2*mr,ym2-mr/2+4*mr);
-        //added by guys
-        out_str=String.format("mot2=%d",mot2);
-        UI.drawString(out_str, xm2+2*mr,ym2-mr/2+5*mr);
 
         // draw Field Of View
         UI.setColor(Color.GRAY);
@@ -258,20 +250,13 @@ public class Arm
     // for motor to be in position(angle) theta1
     // linear intepolation
     public int get_pwm1(){
-        int pwm = 0;
+        int pwm = (int)((theta1 * -7.04) + 748.98); // -10*theta1 + 200;
         return pwm;
     }
     // ditto for motor 2
     public int get_pwm2(){
-        int pwm =0;
+        int pwm= (int)((theta2 * -10.61) + 1020); // -10*theta2 + 1000;
         //pwm = (int)(pwm2_90 + (theta2 - 90)*pwm2_slope);
         return pwm;
-    }
-
-    public void setMotor(){
-        //mot1 = (int)((theta1 - 46.9)/-0.098);
-        //mot2 = (int)((theta2 - 70.6)/-0.098);
-        mot1 = (int)(((theta1*180/Math.PI) * -10.17) + 182.57);
-        mot2 = (int)(((theta2*180/Math.PI) * -10.187) + 721.62);
     }
 }
