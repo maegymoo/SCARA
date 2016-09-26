@@ -32,7 +32,7 @@ public class Main{
         UI.addButton("Load path XY", this::load_xy);
         UI.addButton("Save path Ang", this::save_ang);
         UI.addButton("Load path Ang:Play", this::load_ang);
-        //UI.addButton("Circle", this::addCircle);
+        UI.addButton("Circle", this::addCircle);
         // UI.addButton("Quit", UI::quit);
         UI.setMouseMotionListener(this::doMouse);
         UI.setKeyListener(this::doKeys);
@@ -45,10 +45,9 @@ public class Main{
         arm.draw();
     }
 
-    /*public void addCircle(){
+    public void addCircle(){
         state = 4;
     }
-    */
 
     public void doKeys(String action){
         UI.printf("Key :%s \n", action);
@@ -68,27 +67,25 @@ public class Main{
         String out_str=String.format("%3.1f %3.1f",x,y);
         UI.drawString(out_str, x+10,y+10);
         // 
-        /*if ((state == 4)&&(action.equals("clicked"))){
+        if ((state == 4)&&(action.equals("clicked"))){
             double x1 = x;
             double y1 = y;
-            double r = 25;
-            for(int t = 0; t<=360; t++){
-                double cx = x1 + r*Math.cos(t);
-                double cy = y1 + r*Math.sin(t);
+            double r = 50;
+            for(int t = 0; t<=360;t=t+4){
+                double cx = x1 + r*Math.cos(t*Math.PI/180);
+                double cy = y1 + r*Math.sin(t*Math.PI/180);
                 UI.printf("Adding point x=%f y=%f\n",cx,cy);
-            drawing.add_point_to_path(x,y,false); // add point with pen down
+                drawing.add_point_to_path(cx,cy,true); // add point with pen down
 
-            arm.inverseKinematic(cx,cy);
-            arm.draw();
-            drawing.draw();
-            drawing.print_path();
+                arm.inverseKinematic(cx,cy);
+                //arm.draw();
+                drawing.draw();
+                drawing.print_path();
             }
-            
         }
-        */
+
         if ((state == 1)&&(action.equals("clicked"))){
             // draw as 
-
             arm.inverseKinematic(x,y);
             arm.draw();
             return;
@@ -98,7 +95,6 @@ public class Main{
             // draw arm and path
             arm.inverseKinematic(x,y);
             arm.draw();
-
             // draw segment from last entered point to current mouse position
             if ((state == 2)&&(drawing.get_path_size()>0)){
                 PointXY lp = new PointXY();
