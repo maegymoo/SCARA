@@ -1,5 +1,3 @@
-
-
 /**
  * Class represents SCARA robotic arm.
  * 
@@ -41,7 +39,7 @@ public class Arm
     private double theta1; // angle of the upper arm
     private double theta2;
 
-    private int mot1;
+    private int mot1;       //not sure what this does ask guys
     private int mot2;
 
     private double xj1;     // positions of the joints
@@ -92,6 +90,7 @@ public class Arm
         UI.drawString(out_str, xm1-2*mr,ym1-mr/2+3*mr);
         out_str=String.format("ym1=%d",ym1);
         UI.drawString(out_str, xm1-2*mr,ym1-mr/2+4*mr);
+        //added by guys
         out_str=String.format("mot1=%d",mot1);
         UI.drawString(out_str, xm1-2*mr,ym1-mr/2+5*mr);
 
@@ -102,13 +101,15 @@ public class Arm
         UI.drawString(out_str, xm2+2*mr,ym2-mr/2+3*mr);
         out_str=String.format("ym2=%d",ym2);
         UI.drawString(out_str, xm2+2*mr,ym2-mr/2+4*mr);
+        //added by guys
         out_str=String.format("mot2=%d",mot2);
         UI.drawString(out_str, xm2+2*mr,ym2-mr/2+5*mr);
+
         // draw Field Of View
         UI.setColor(Color.GRAY);
         UI.drawRect(0,0,640,480);
 
-        // it can b euncommented later when
+        // it can be uncommented later when
         // kinematic equations are derived
         if ( valid_state) {
             // draw upper arms
@@ -125,26 +126,33 @@ public class Arm
 
     }
 
+    //find the distance between 2 points using pythagoras... this tidies up code
+    public double distance(double point1x, double point1y, double point2x, double point2y){
+        double x = point2x - point1x;
+        double y = point2y - point1y;
+        return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+    }
+
     // calculate tool position from motor angles 
     // updates variable in the class
     public void directKinematic(){
-
         // midpoint between joints
-        double  xa = xj1 + 0.5*(xj2 - xj1);
-        double  ya = yj1 + 0.5*(yj2 - yj1);
+        double xa = xj1 + 0.5*(xj2 - xj1);
+        double ya = yj1 + 0.5*(yj2 - yj1);
+
         // distance between joints
-        double d = Math.sqrt(Math.pow(xj1 - xj2, 2) + Math.pow(yj1 - yj2, 2));
+        double d = distance(xj1, yj1, xj2, yj2);
+
         if (d<2*r){
             valid_state = true;
-            // half distance between tool positions
-            double  h = Math.sqrt(Math.pow(r, 2)/2 - (Math.pow(xj1 - xj2, 2) + Math.pow(yj1 - yj2, 2))/8);
-            double alpha = Math.atan((yj1-yj2)/(xj1-xj2)) ;
-            // tool position
 
-            xt = xa + h*Math.cos(alpha-Math.PI/2);
-            yt = ya + h*Math.sin(alpha-Math.PI/2);
-            double xt2 = xa - h*Math.cos(alpha-Math.PI/2);
-            double yt2 = ya - h*Math.sin(alpha-Math.PI/2);
+            // half distance between tool positions
+            double h = Math.sqrt(Math.pow(r, 2)/2 - (Math.pow(xj1 - xj2, 2) + Math.pow(yj1 - yj2, 2))/8);
+            double a = Math.atan2((yj1-yj2),(xj1-xj2)) ;
+
+            // tool position
+            xt = xa - h*Math.cos(a-Math.PI/2);
+            yt = ya - h*Math.sin(a-Math.PI/2);
         } else {
             valid_state = false;
         }
@@ -153,20 +161,19 @@ public class Arm
 
     // motor angles from tool position
     // updetes variables of the class
-    public void inverseKinematic(double xt_new,double yt_new){
-
-        valid_state = true;
+    public boolean inverseKinematic(double xt_new,double yt_new){
         xt = xt_new;
         yt = yt_new;
         valid_state = true;
-        double dx1 = xt - xm1; 
-        double dy1 = yt - ym1;
-        // distance between pem and motor
-        double d1 = Math.sqrt(Math.pow(dx1, 2) + Math.pow(dy1, 2));
+
+        //Joint #1
+        // distance between pen and motor1
+        double d1 = distance(xm1, ym1, xt, yt);
+
         if (d1>2*r){
             UI.println("Arm 1 - can not reach");
             valid_state = false;
-            return;
+            return false;
         }
 
         double l1 = d1/2;
@@ -184,24 +191,24 @@ public class Arm
         theta1 = Math.atan2(yj1 - ym1, xj1 - xm1);
         if ((theta1>0)||(theta1<-Math.PI)){
             valid_state = false;
-            UI.println("Ange 1 -invalid");
-            return;
+            UI.println("Angle 1 -invalid");
+            return false;
         }
 
-        // theta12 = atan2(yj12 - ym1,xj12-xm1);
-        double dx2 = xt - xm2; 
-        double dy2 = yt - ym2;
-        double d2 = Math.sqrt(Math.pow(dx2, 2) + Math.pow(dy2, 2));;
+        //Joint #2
+        // distance between pen and motor2
+        double d2 = distance(xm2, ym2, xt, yt);
+
         if (d2>2*r){
             UI.println("Arm 2 - can not reach");
             valid_state = false;
-            return;
+            return false;
         }
 
         double l2 = d2/2;
-
         double h2 = Math.sqrt(r*r - l2*l2);
         double a2 = Math.atan2((yt - ym2),(xm2 - xt));
+
         //positions of y
         double xa2 = xm2 + 0.5*(xt - xm2);
         double ya2 = ym2 + 0.5*(yt - ym2);
@@ -209,19 +216,28 @@ public class Arm
         // elbows positions
         xj2 = xa2 - h2 * Math.cos(Math.PI/2 - a2);
         yj2 = ya2 - h2 * Math.sin(Math.PI/2 - a2);
-        // motor angles for both 1st elbow positions
+
         theta2 = Math.atan2(yj2 - ym2, xj2 - xm2);
         if ((theta2>0)||(theta2<-Math.PI)){
             valid_state = false;
-            UI.println("Ange 2 -invalid");
-            return;
+            UI.println("Angle 2 -invalid");
+            return false;
         }
-        setMotor();
 
+        //singularity
+        double opp1 = xt - xj1;
+        double adj1 = yt - yj1;
+        double opp2 = xj2 - xt;
+        double adj2 = yt - yj2; 
+        double s1 = Math.atan2(opp1, adj1);
+        double s2 = Math.atan2(opp2, adj2);
+        double st = s1 + s2;
+        UI.println("singularity angle:" +st);
+        if(st<= Math.PI) return false;
+        
         UI.printf("xt:%3.1f, yt:%3.1f\n",xt,yt);
         UI.printf("theta1:%3.1f, theta2:%3.1f\n",theta1*180/Math.PI,theta2*180/Math.PI);
-        
-        return;
+        return true;
     }
 
     // returns angle of motor 1
@@ -253,7 +269,7 @@ public class Arm
     }
 
     public void setMotor(){
-       // mot1 = (int)((theta1 - 46.9)/-0.098);
+        //mot1 = (int)((theta1 - 46.9)/-0.098);
         //mot2 = (int)((theta2 - 70.6)/-0.098);
         mot1 = (int)(((theta1*180/Math.PI) * -10.17) + 182.57);
         mot2 = (int)(((theta2*180/Math.PI) * -10.187) + 721.62);
