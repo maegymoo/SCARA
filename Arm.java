@@ -38,6 +38,9 @@ public class Arm
     // current state of the arm
     private double theta1; // angle of the upper arm
     private double theta2;
+    private int pwm1;
+    private int pwm2;
+    
 
     private double xj1;     // positions of the joints
     private double yj1; 
@@ -53,9 +56,9 @@ public class Arm
     public Arm()
     {
         xm1 = 288; // set motor coordinates
-        ym1 = 377;
+        ym1 = 378;
         xm2 = 378;
-        ym2 = 374;
+        ym2 = 378;
         r = 156.0;
         theta1 = -90.0*Math.PI/180.0; // initial angles of the upper arms
         theta2 = -90.0*Math.PI/180.0;
@@ -88,6 +91,8 @@ public class Arm
         UI.drawString(out_str, xm1-2*mr,ym1-mr/2+3*mr);
         out_str=String.format("ym1=%d",ym1);
         UI.drawString(out_str, xm1-2*mr,ym1-mr/2+4*mr);
+        out_str=String.format("pwm1=%d",pwm1);
+        UI.drawString(out_str, xm1-2*mr,ym1-mr/2+5*mr);
 
         // ditto for second motor                
         out_str = String.format("t2=%3.1f",theta2*180/Math.PI);
@@ -96,6 +101,8 @@ public class Arm
         UI.drawString(out_str, xm2+2*mr,ym2-mr/2+3*mr);
         out_str=String.format("ym2=%d",ym2);
         UI.drawString(out_str, xm2+2*mr,ym2-mr/2+4*mr);
+        out_str=String.format("pwm1=%d",pwm2);
+        UI.drawString(out_str, xm2-2*mr,ym2-mr/2+5*mr);
 
         // draw Field Of View
         UI.setColor(Color.GRAY);
@@ -215,7 +222,7 @@ public class Arm
             UI.println("Angle 2 -invalid");
             return false;
         }
-
+        
         //singularity
         double opp1 = xt - xj1;
         double adj1 = yt - yj1;
@@ -226,6 +233,10 @@ public class Arm
         double st = s1 + s2;
         UI.println("singularity angle:" +st);
         if(st<= Math.PI) return false;
+
+       pwm1 = (int)((theta1 * (180/Math.PI) * -9.8874) + 257.22); // -10*theta1 + 200;
+       pwm2 = (int)((theta2 * (180/Math.PI) * -10) + 890); // -10*theta2 + 1000;
+
         
         UI.printf("xt:%3.1f, yt:%3.1f\n",xt,yt);
         UI.printf("theta1:%3.1f, theta2:%3.1f\n",theta1*180/Math.PI,theta2*180/Math.PI);
@@ -250,13 +261,13 @@ public class Arm
     // for motor to be in position(angle) theta1
     // linear intepolation
     public int get_pwm1(){
-        int pwm = (int)((theta1 * -7.04) + 748.98); // -10*theta1 + 200;
-        return pwm;
+         pwm1 = (int)((theta1 * -9.8874) + 257.22); // -10*theta1 + 200;
+        return pwm1;
     }
     // ditto for motor 2
     public int get_pwm2(){
-        int pwm= (int)((theta2 * -10.61) + 1020); // -10*theta2 + 1000;
+         pwm2= (int)((theta2 * -10) + 890); // -10*theta2 + 1000;
         //pwm = (int)(pwm2_90 + (theta2 - 90)*pwm2_slope);
-        return pwm;
+        return pwm2;
     }
 }
