@@ -35,6 +35,7 @@ public class Main{
         UI.addButton("Circle", this::addCircle);
         UI.addButton("rect", this::addRect);
         UI.addButton("snow", this::addSnow);
+        
         // UI.addButton("Quit", UI::quit);
         UI.setMouseMotionListener(this::doMouse);
         UI.setKeyListener(this::doKeys);
@@ -54,10 +55,10 @@ public class Main{
     public void addRect(){
         state=5;
     }
-    
     public void addSnow(){
         state=6;
     }
+
     public void doKeys(String action){
         UI.printf("Key :%s \n", action);
         if (action.equals("b")) {
@@ -79,8 +80,8 @@ public class Main{
         if ((state == 4)&&(action.equals("clicked"))){
             double x1 = x;
             double y1 = y;
-            double r = 50;
-            for(int t = 0; t<=360;t=t+4){
+            double r = 36;
+            for(int t = 0; t<=360;t=t+20){
                 double cx = x1 + r*Math.cos(t*Math.PI/180);
                 double cy = y1 + r*Math.sin(t*Math.PI/180);
                 UI.printf("Adding point x=%f y=%f\n",cx,cy);
@@ -93,35 +94,36 @@ public class Main{
             }
         }
         if ((state == 5)&&(action.equals("clicked"))){
-                drawing.add_point_to_path(x,y,true); // add point with pen down
-                arm.inverseKinematic(x,y);
-                //arm.draw();
-                drawing.draw();
-                drawing.print_path();
-                
-                drawing.add_point_to_path(x+50,y,true); // add point with pen down
-                arm.inverseKinematic(x +50,y);
-                //arm.draw();
-                drawing.draw();
-                drawing.print_path();
-                
-                drawing.add_point_to_path(x+50,y-50,true); // add point with pen down
-                arm.inverseKinematic(x +50,y-50);
-                //arm.draw();
-                drawing.draw();
-                drawing.print_path();
-                
-                drawing.add_point_to_path(x,y-50,true); // add point with pen down
-                arm.inverseKinematic(x,y-50);
-                //arm.draw();
-                drawing.draw();
-                drawing.print_path();
-                
-                drawing.add_point_to_path(x,y,true); // add point with pen down
-                arm.inverseKinematic(x,y);
-                //arm.draw();
-                drawing.draw();
-                drawing.print_path();
+            int i = 60;
+            drawing.add_point_to_path(x,y,true); // add point with pen down
+            arm.inverseKinematic(x,y);
+            //arm.draw();
+            drawing.draw();
+            drawing.print_path();
+
+            drawing.add_point_to_path(x+i,y,true); // add point with pen down
+            arm.inverseKinematic(x +i,y);
+            //arm.draw();
+            drawing.draw();
+            drawing.print_path();
+
+            drawing.add_point_to_path(x+i,y-i,true); // add point with pen down
+            arm.inverseKinematic(x +i,y-i);
+            //arm.draw();
+            drawing.draw();
+            drawing.print_path();
+
+            drawing.add_point_to_path(x,y-i,true); // add point with pen down
+            arm.inverseKinematic(x,y-i);
+            //arm.draw();
+            drawing.draw();
+            drawing.print_path();
+
+            drawing.add_point_to_path(x,y,true); // add point with pen down
+            arm.inverseKinematic(x,y);
+            //arm.draw();
+            drawing.draw();
+            drawing.print_path();
         }
         if  ((state == 6)&&(action.equals("clicked"))){
             double r = 25;
@@ -174,7 +176,6 @@ public class Main{
             drawing.print_path();
             
         }
-        
         if ((state == 1)&&(action.equals("clicked"))){
             // draw as 
             arm.inverseKinematic(x,y);
