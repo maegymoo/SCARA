@@ -33,6 +33,7 @@ public class Main{
         UI.addButton("Save path Ang", this::save_ang);
         UI.addButton("Load path Ang:Play", this::load_ang);
         UI.addButton("Circle", this::addCircle);
+        UI.addButton("rect", this::addRect);
         // UI.addButton("Quit", UI::quit);
         UI.setMouseMotionListener(this::doMouse);
         UI.setKeyListener(this::doKeys);
@@ -49,6 +50,9 @@ public class Main{
         state = 4;
     }
 
+    public void addRect(){
+        state=5;
+    }
     public void doKeys(String action){
         UI.printf("Key :%s \n", action);
         if (action.equals("b")) {
@@ -83,7 +87,38 @@ public class Main{
                 drawing.print_path();
             }
         }
-
+        if ((state == 5)&&(action.equals("clicked"))){
+                drawing.add_point_to_path(x,y,true); // add point with pen down
+                arm.inverseKinematic(x,y);
+                //arm.draw();
+                drawing.draw();
+                drawing.print_path();
+                
+                drawing.add_point_to_path(x+50,y,true); // add point with pen down
+                arm.inverseKinematic(x +50,y);
+                //arm.draw();
+                drawing.draw();
+                drawing.print_path();
+                
+                drawing.add_point_to_path(x+50,y-50,true); // add point with pen down
+                arm.inverseKinematic(x +50,y-50);
+                //arm.draw();
+                drawing.draw();
+                drawing.print_path();
+                
+                drawing.add_point_to_path(x,y-50,true); // add point with pen down
+                arm.inverseKinematic(x,y-50);
+                //arm.draw();
+                drawing.draw();
+                drawing.print_path();
+                
+                drawing.add_point_to_path(x,y,true); // add point with pen down
+                arm.inverseKinematic(x,y);
+                //arm.draw();
+                drawing.draw();
+                drawing.print_path();
+        }
+        
         if ((state == 1)&&(action.equals("clicked"))){
             // draw as 
             arm.inverseKinematic(x,y);
