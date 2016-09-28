@@ -81,7 +81,7 @@ public class Main{
             double x1 = x;
             double y1 = y;
             double r = 36;
-            for(int t = 0; t<=360;t=t+20){
+            for(int t = 0; t<=360;t=t+8){
                 double cx = x1 + r*Math.cos(t*Math.PI/180);
                 double cy = y1 + r*Math.sin(t*Math.PI/180);
                 UI.printf("Adding point x=%f y=%f\n",cx,cy);
